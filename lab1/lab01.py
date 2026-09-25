@@ -3,21 +3,6 @@ import cv2 as cv;
 import matplotlib.pyplot as plt;
 
 
-def rgbToGrayScale(img):
-    output = np.zeros((img.shape[0], img.shape[1]), dtype=np.uint8);
-    for i in range(img.shape[0]):       # строки
-        for j in range(img.shape[1]):   # столбцы
-            # предоставленная формула для перевода в оттенки серого
-            # 0.114 синий канал
-            # 0.587 зелёный
-            # 0.299 красный
-            output[i, j] = (
-                0.114 * img[i, j, 0]
-                + 0.587 * img[i, j, 1]
-                + 0.299 * img[i, j, 2]
-            );
-    return output;
-
 def buildHistogram(img):
     h = np.zeros(256, dtype=np.int32);
     for i in range(img.shape[0]):
