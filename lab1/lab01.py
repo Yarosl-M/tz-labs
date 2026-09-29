@@ -16,8 +16,23 @@ for image_name in images:
     img_bgr = cv.imread(image_name);
     # копии монохромны
     gray2 = cv.cvtColor(img_bgr, cv.COLOR_BGR2GRAY);
-    h = buildHistogram(gray2);
-    bins = [i for i in range(256)];
-    plt.bar(bins, h);
+    
+    fig, ax = plt.subplots(1, 2);
+    
+    bins1 = [i for i in range(256)];
+    h1 = buildHistogram(gray2);
+    ax[0].bar(bins1, h1);
+    ax[0].set_title('Собственная гистограмма');
+    ax[0].set_xlabel('Яркость');
+    ax[0].set_ylabel('Количество пикселей');
+    
+    h2 = cv.calcHist(
+        [gray2],
+        [0],
+        None,
+        [256],
+        [0, 256]
+    );
+    plt.bar(bins1, h);
     plt.tight_layout();
     plt.show();
