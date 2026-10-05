@@ -39,8 +39,6 @@ def histEqualization(img):
     return None
     #
 
-
-
 images = ['img1.jpg', 'img2.jpg', 'img3.jpg']; # имена файлов для загрузки
 labels = ['Исходное изображение', 'Недоэкспонированное изображение',
           'Переэкспонированное изображение'];
@@ -48,29 +46,46 @@ labels = ['Исходное изображение', 'Недоэкспониро
 for image_name, label in zip(images, labels):
     # чтение файла изображения 
     img_bgr = cv.imread(image_name);
-    
-    # copies are monochrome
     gray = cv.cvtColor(img_bgr, cv.COLOR_BGR2GRAY);
     
-    fig, ax = plt.subplots(1, 2);
+    # эквализация изображения
+    equalized = histEqualization(gray);
     
-    # отображение изображения в оттенках серого
-    ax[0].imshow(gray, cmap='gray', vmin=0, vmax=255);
-    ax[0].set_title('Изображение в оттенках серого');
-    ax[0].axis('off');
-
+    fig, ax = plt.subplots(2, 2);
+    
     bins = [i for i in range(256)];
-    # построение гистограммы через OpenCV
+    
+    # отображение исходного изображения в оттенках серого
+    ax[0, 0].imshow(gray, cmap='gray', vmin=0, vmax=255);
+    ax[0, 0].set_title('Исходное изображение');
+    ax[0, 0].axis('off');
+    
+    # построение гистограммы исходного изображения
     h = cv.calcHist(
-        [gray],    # исходное изображение в виде списка
-        [0],        # индекс канала для которого вычисляется гистограмма (0 — в оттенках серого, 1—3 — цвета BGR)
-        None,       # маска (None — без маски)
-        [256],      # массив размеров гистограммы
-        [0, 256]    # диапазон значений яркости
+        [gray],
+        [0],
+        None,
+        [256],
+        [0, 256]
     );
-    # 
-    ax[1].bar(bins, h);
-    ax[1].set_title('Гистограмма cv.calcHist()');
+    ax[0, 1].bar(bins, h);
+    ax[0, 1].set_title('Исходная гистограмма');
+    
+    # отображение изображения после эквализации
+    ax[1, 0].imshow(equalized, cmap='gray', vmin=0, vmax=255);
+    ax[1, 0].set_title('После эквализации');
+    ax[1, 0].axis('off');
+    
+    # построение гистограммы изображения после эквализации
+    h_equalized = cv.calcHist(
+        [equalized],
+        [0],
+        None,
+        [256],
+        [0, 256]
+    );
+    ax[1, 1].bar(bins, h_equalized);
+    ax[1, 1].set_title('Гистограмма после эквализации');
     
     fig.suptitle(label);
     plt.tight_layout();
