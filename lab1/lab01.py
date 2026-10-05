@@ -89,13 +89,13 @@ for image_name, label in zip(images, labels):
     ax[0, 0].axis('off');
     
     # гистограмма ручной эквализации
-    ax[1, 0].bar(bins, h_manual);
-    ax[1, 0].set_title('Гистограмма ручной эквализации');
+    ax[0, 1].bar(bins, h_manual);
+    ax[0, 1].set_title('Гистограмма ручной эквализации');
     
     # изображение после эквализации OpenCV
-    ax[0, 1].imshow(equalized_cv, cmap='gray', vmin=0, vmax=255);
-    ax[0, 1].set_title('cv.equalizeHist');
-    ax[0, 1].axis('off');
+    ax[1, 0].imshow(equalized_cv, cmap='gray', vmin=0, vmax=255);
+    ax[1, 0].set_title('cv.equalizeHist');
+    ax[1, 0].axis('off');
     
     # гистограмма эквализации OpenCV
     ax[1, 1].bar(bins, h_cv);
