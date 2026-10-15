@@ -89,7 +89,7 @@ for image_name, label in zip(images, labels):
     ax[0, 0].axis('off');
     
     # гистограмма ручной эквализации
-    ax[0, 1].bar(bins, h_manual);
+    ax[0, 1].bar(bins, h_manual, color='black');
     ax[0, 1].set_title('Гистограмма ручной эквализации');
     
     # изображение после эквализации OpenCV
@@ -98,7 +98,7 @@ for image_name, label in zip(images, labels):
     ax[1, 0].axis('off');
     
     # гистограмма эквализации OpenCV
-    ax[1, 1].bar(bins, h_cv);
+    ax[1, 1].bar(bins, h_cv, color='black');
     ax[1, 1].set_title('Гистограмма cv.equalizeHist');
     
     fig.suptitle(label);
