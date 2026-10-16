@@ -111,8 +111,7 @@ for image_name, label in zip(images, labels):
     cdf_ax.plot(bins, cdf_cv, color='red');
     cdf_ax.set_ylim(0,cdf_cv[-1]);
     cdf_ax.set_ylabel("Количество пикселей, которые\nимеют заданное или\nменьшее значение оттенка");
-
-    
+   
     ax[1, 1].set_title('Гистограмма cv.equalizeHist');
     
     fig.suptitle(label);
