@@ -1,118 +1,81 @@
-import numpy as np;
 import cv2 as cv;
 import matplotlib.pyplot as plt;
+from sys import argv;
 
 
-def makeCdf(histogram):
-    integral = np.zeros_like(histogram);
-    integral[0] = histogram[0];
-    for i in range(1, integral.shape[0]):
-        integral[i] = integral[i - 1] + histogram[i];
-    return integral;
+def brightness_up(img, c):
+    r, g, b = cv.split(img);
+    lim = 255 - c;
+    r[r > lim] = 255;
+    r[r <= lim] += c;
+    g[g > lim] = 255;
+    g[g <= lim] += c;
+    b[b > lim] = 255;
+    b[b <= lim] += c;
+    return cv.merge((r, g, b));
 
 
-def histEqualization(img):
-    h = cv.calcHist(
-        [img],      # исходное изображение в виде списка
-        [0],        # индекс канала для которого вычисляется гистограмма (0 — в оттенках серого, 1—3 — цвета BGR)
-        None,       # маска (None — без маски)
-        [256],      # массив размеров гистограммы
-        [0, 256]    # диапазон значений яркости
-    );
-    numPixels = img.shape[0] * img.shape[1];
-    
-    cdf = makeCdf(h);
-    
-    # нормализация
-    firstNonZero = 0;
-    for el in h:
-        if el != 0:
-            firstNonZero = el;
-            break;
-    
-    sourceRange = numPixels;
-    destinationRange = 256;
-    
-    lut = np.zeros_like(h);
-    
-    for i in range(destinationRange):
-        offset = cdf[i] - firstNonZero;
-        if offset < 0:
-            offset = 0;
-        lut[i] = (offset / sourceRange) * destinationRange;
-    
-    return cv.LUT(img, lut).astype(np.uint8);
-    return None;
-    #
+def brightness_down(img, c):
+    r, g, b = cv.split(img);
+    lim = c;
+    r[r < lim] = 0;
+    r[r >= lim] -= c;
+    g[g < lim] = 0;
+    g[g >= lim] -= c;
+    b[b < lim] = 0;
+    b[b >= lim] -= c;
+    return cv.merge((r, g, b));
 
+######################################################################
+
+if len(argv) != 3:
+    print(f"Использование: python {argv[0]} <alpha1> <alpha2>");
+    exit(-1);
 
 images = ['img1.jpg', 'img2.jpg', 'img3.jpg']; # имена файлов для загрузки
 labels = ['Исходное изображение', 'Недоэкспонированное изображение',
           'Переэкспонированное изображение'];
 
-for image_name, label in zip(images, labels):
-    # чтение файла изображения
+for image_name, label in zip(images[1:], labels[1:]):
     img_bgr = cv.imread(image_name);
-    gray = cv.cvtColor(img_bgr, cv.COLOR_BGR2GRAY);
-    
-    # ручная эквализация
-    equalized_manual = histEqualization(gray);
-    
-    # эквализация с помощью OpenCV
-    equalized_cv = cv.equalizeHist(gray);
+    # gray = cv.cvtColor(img_bgr, cv.COLOR_BGR2GRAY);
+    img_rgb = cv.cvtColor(img_bgr, cv.COLOR_BGR2RGB);
+    img_rgb_corrected = brightness_up(img_rgb, int(argv[1])) if image_name == 'img2.jpg' else brightness_down(img_rgb, int(argv[2]));
     
     bins = [i for i in range(256)];
     
-    # гистограмма ручной эквализации
-    h_manual = cv.calcHist(
-        [equalized_manual],
+    hist1 = cv.calcHist(
+        [cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY)],
         [0],
         None,
         [256],
         [0, 256]
     );
-    
-    # гистограмма эквализации OpenCV
-    h_cv = cv.calcHist(
-        [equalized_cv],
+    hist2 = cv.calcHist(
+        [cv.cvtColor(img_rgb_corrected, cv.COLOR_RGB2GRAY)],
         [0],
         None,
         [256],
         [0, 256]
     );
-    
+
     fig, ax = plt.subplots(2, 2);
+
     
-    # изображение после ручной эквализации
-    ax[0, 0].imshow(equalized_manual, cmap='gray', vmin=0, vmax=255);
-    ax[0, 0].set_title('Ручная эквализация');
+    ax[0, 0].imshow(img_rgb);
+    ax[0, 0].set_title('Изображение до коррекции');
     ax[0, 0].axis('off');
-    
-    # гистограмма ручной эквализации
-    ax[0, 1].bar(bins, h_manual, color='black');
-    cdf_manual = makeCdf(h_manual).flatten();
-    cdf_ax = ax[0, 1].twinx();
-    cdf_ax.plot(bins, cdf_manual, color='red');
-    cdf_ax.set_ylim(0,cdf_manual[-1]);
-    cdf_ax.set_ylabel("Количество пикселей, которые\nимеют заданное или\nменьшее значение оттенка");
 
-    ax[0, 1].set_title('Гистограмма ручной эквализации');
+    ax[0, 1].bar(bins, hist1, color='black');
+    ax[0, 1].set_title('Гистограмма до коррекции');
 
-    
-    # изображение после эквализации OpenCV
-    ax[1, 0].imshow(equalized_cv, cmap='gray', vmin=0, vmax=255);
-    ax[1, 0].set_title('cv.equalizeHist');
+
+    ax[1, 0].imshow(img_rgb_corrected);
+    ax[1, 0].set_title('Изображение после коррекции');
     ax[1, 0].axis('off');
     
-    # гистограмма эквализации OpenCV
-    ax[1, 1].bar(bins, h_cv, color='black');
-    cdf_cv = makeCdf(h_cv).flatten();
-    cdf_ax = ax[1, 1].twinx();
-    cdf_ax.plot(bins, cdf_cv, color='red');
-    cdf_ax.set_ylim(0,cdf_cv[-1]);
-    cdf_ax.set_ylabel("Количество пикселей, которые\nимеют заданное или\nменьшее значение оттенка");
-   
-    ax[1, 1].set_title('Гистограмма cv.equalizeHist');
+    ax[1, 1].bar(bins, hist2, color='black');   
+    ax[1, 1].set_title('Гистограмма после коррекции');
     
     fig.suptitle(label);
     plt.tight_layout();
