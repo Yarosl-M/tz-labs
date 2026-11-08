@@ -5,6 +5,7 @@ from sys import argv;
 
 
 FILENAME = 'bees.png';
+FILENAME_NEW = 'img.jpg';
 
 ###############################################################################
 
@@ -18,7 +19,7 @@ gray = cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY);
 #img_blur_median = None;
 #img_blur_gauss = None;
 
-THRESH = 64 + 32 - 16 - 8;
+THRESH = 72;
 
 thresh_manual, img_manual = cv.threshold(gray, THRESH, 255, cv.THRESH_BINARY);
 thresh_otsu, img_otsu = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
