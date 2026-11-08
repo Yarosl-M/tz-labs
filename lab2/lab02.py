@@ -13,6 +13,11 @@ img_gray = cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY);
 
 # 2) Выполнить бинаризацию
 # сначала размытие изображения
-img_blur_median = None;
-img_blur_gauss = None;
+#img_blur_median = None;
+#img_blur_gauss = None;
 
+THRESH = 127;
+
+stuff = cv.threshold(img_gray, THRESH, 255, cv.THRESH_BINARY_INV);
+
+print("Bepis");
