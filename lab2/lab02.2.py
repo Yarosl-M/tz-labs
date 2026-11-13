@@ -15,7 +15,7 @@ img_rgb = cv.cvtColor(img_bgr, cv.COLOR_BGR2RGB);
 gray = cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY);
 
 # 2) Выполнить бинаризацию
-THRESH = 72;
+THRESH = 66;
 
 thresh_manual, img_manual = cv.threshold(gray, THRESH, 255, cv.THRESH_BINARY);
 thresh_otsu, img_otsu = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
@@ -24,37 +24,56 @@ img_mean = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C,\
 img_gauss = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
             cv.THRESH_BINARY, blockSize=55, C=1);
 
-# TODO: нужно будет также отображать гистограммы и порог бинаризации
-fig, ax = plt.subplots(3, 2, dpi=200);
+# гистограмма ч/б изображения
+bins = np.arange(256);
+histogram = cv.calcHist([gray], [0], None, [256], [0, 256]);
 
+# показать исходное изображение и ч/б
+fig, ax = plt.subplots(1, 3, figsize=(14,4), dpi=200);
+ax[0].imshow(img_rgb);
+ax[0].axis('off');
 
-ax[0,0].imshow(img_rgb);
-ax[0,0].set_title('Исходное изображение');
-ax[0,0].axis('off');
+ax[1].imshow(gray, cmap='gray', vmin=0, vmax=255);
+ax[1].set_title('Исходное изображение\nи изображение в оттенках серого');
+ax[1].axis('off');
 
-ax[0, 1].imshow(gray, cmap='gray', vmin=0, vmax=255);
-ax[0, 1].set_title('Изображение в оттенках серого');
-ax[0, 1].axis('off');
-
-# ручная бинаризация с пороговым значением = THRESH
-ax[1,0].imshow(img_manual, cmap='gray', vmin=0, vmax=255);
-ax[1,0].set_title('Ручная бинаризация');
-ax[1,0].axis('off');
-
-# бинаризация методом Отцу
-ax[1, 1].imshow(img_otsu, cmap='gray', vmin=0, vmax=255);
-ax[1, 1].set_title('Бинаризация методом Отцу (порог = %d)' % thresh_otsu);
-ax[1, 1].axis('off');
-
-# адаптивная бинаризация № 1
-ax[2,0].imshow(img_mean, cmap='gray', vmin=0, vmax=255);
-ax[2,0].set_title('Адаптивная бинаризация\nпо среднему значению');
-ax[2,0].axis('off');
-
-# адаптивная бинаризация № 2
-ax[2, 1].imshow(img_gauss, cmap='gray', vmin=0, vmax=255);
-ax[2, 1].set_title('Адаптивная бинаризация по Гауссу');
-ax[2, 1].axis('off');
+ax[2].bar(bins, histogram);
+ax[2].set_title('Гистограмма изображения в оттенках серого');
+ax[2].set_xlim(0, 255);
+ax[2].set_xlabel('Уровень яркости');
+ax[2].set_ylabel('Количество пикселей');
 
 fig.tight_layout();
 plt.show();
+
+# результаты разных методов бинаризации и гистограммы
+binary_images = [
+    ('Ручная бинаризация', img_manual, thresh_manual),
+    ('Бинаризация методом Отцу', img_otsu, thresh_otsu),
+    ('Адаптивная бинаризация\nпо среднему значению', img_mean, None),
+    ('Адаптивная бинаризация по Гауссу', img_gauss, None),
+];
+
+for title, binary_img, threshold in binary_images:
+    fig, ax = plt.subplots(1, 2, figsize=(10,4),dpi=200);
+
+    ax[0].imshow(binary_img, cmap='gray', vmin=0, vmax=255);
+    ax[0].set_title(title);
+    ax[0].axis('off');
+
+    ax[1].bar(bins, histogram);
+    if threshold is not None:
+        ax[1].axvline(
+            threshold,
+            color='red',
+            linestyle='--',
+            label='Порог = %d' % threshold
+        );
+        ax[1].legend();
+    ax[1].set_title(f'Гистограмма изображения {"\n(порог — адаптивный)" if threshold is None else ""}');
+    ax[1].set_xlim(0, 255);
+    ax[1].set_xlabel('Уровень яркости');
+    ax[1].set_ylabel('Количество пикселей');
+
+    fig.tight_layout();
+    plt.show();
