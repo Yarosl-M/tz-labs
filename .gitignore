@@ -182,3 +182,4 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 /lab1/_stuff
+/lab2/stuff

@@ -4,13 +4,12 @@ import matplotlib.pyplot as plt;
 from sys import argv;
 
 
-FILENAME = 'bees.png';
-FILENAME_NEW = 'img.jpg';
+FILENAME = ['bees.png', 'img.jpg', 'img2.webp', 'aaaaaaaaaaaaaaaaaaaa.jpg']
 
 ###############################################################################
 
 # 1) Загрузить изображение
-img_bgr = cv.imread(FILENAME);
+img_bgr = cv.imread(FILENAME[-1]);
 img_rgb = cv.cvtColor(img_bgr, cv.COLOR_BGR2RGB);
 gray = cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY);
 
