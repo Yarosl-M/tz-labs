@@ -40,7 +40,7 @@ def convolution2(image, kernel):
             output[i, j] = 255;
     return np.round(output).astype(np.uint8);
 
-KERNEL_SIZE = 21;
+KERNEL_SIZE = 15;
 
 KERNEL_LOWPASS = np.ones((KERNEL_SIZE, KERNEL_SIZE)) / (KERNEL_SIZE ** 2);
 
@@ -65,7 +65,8 @@ C_MEAN = 6;
 BLOCKSIZE_GAUSS = 37;
 C_GAUSS = 5;
 
-gray = cv.blur(gray, (KERNEL_SIZE, KERNEL_SIZE));
+# gray = cv.blur(gray, (KERNEL_SIZE, KERNEL_SIZE));
+gray = cv.GaussianBlur(gray, (KERNEL_SIZE, KERNEL_SIZE), 0);   
 
 # gray = cv.medianBlur(gray, KERNEL_SIZE);
 # gray = convolution2(gray, KERNEL_LOWPASS);
