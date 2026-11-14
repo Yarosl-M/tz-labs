@@ -1,6 +1,7 @@
 import numpy as np;
 import cv2 as cv;
 import matplotlib.pyplot as plt;
+from sys import argv;
 
 
 FILENAME = ['bees.png', 'img.jpg', 'img2.webp',
@@ -33,11 +34,15 @@ def convolution2(image, kernel):
                     value = image[ni_new, nj_new]* kernel[kernel_i, kernel_j];
                     output[i, j] = output[i, j] + value;
                 kernel_j = -1;
-        # if output[i, j] < 0:
-        #     output[i, j] = 0;
-        # elif output[i, j] > 255:
-        #     output[i, j] = 255;
-    return np.round(output);
+        if output[i, j] < 0:
+            output[i, j] = 0;
+        elif output[i, j] > 255:
+            output[i, j] = 255;
+    return np.round(output).astype(np.uint8);
+
+KERNEL_SIZE = 21;
+
+KERNEL_LOWPASS = np.ones((KERNEL_SIZE, KERNEL_SIZE)) / (KERNEL_SIZE ** 2);
 
 KERNEL_HIGHPASS_X = np.array([[-1, 0, 1],
                             [-2, 0, 2],
@@ -46,10 +51,11 @@ KERNEL_HIGHPASS_Y = np.array([[-1, -2, -1],
                               [0,0,0],
                               [1, 2, 1]]);
 
+# возвращает кортеж из трёх массивов — по двум осям и совмещённый
 def sobel(img):
     dx = convolution2(img, KERNEL_HIGHPASS_X);
     dy = convolution2(img, KERNEL_HIGHPASS_Y);
-    s = np.sqrt(np.square(dx) + np.square(dy));
+    s = np.square(dx) + np.square(dy);
     return (dx, dy, s);
 
 ###############################################################################
@@ -59,20 +65,75 @@ img_bgr = cv.imread('./stuff/' + FILENAME[-1]);
 img_rgb = cv.cvtColor(img_bgr, cv.COLOR_BGR2RGB);
 gray = cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY);
 
-dx, dy, g = sobel(gray);
+# 2) Выполнить бинаризацию
+THRESH = 120;
+BLOCKSIZE_MEAN = 25;
+C_MEAN = 6;
+BLOCKSIZE_GAUSS = 37;
+C_GAUSS = 5;
 
-fig, ax = plt.subplots(2, 2);
-ax[0, 0].imshow(gray, cmap="gray", vmin=0, vmax=255);
-ax[0, 0].set_title("Исходное изображение");
+# gray = cv.blur(gray, (KERNEL_SIZE, KERNEL_SIZE));
 
-ax[0, 1].imshow(g, cmap="gray");
-ax[0, 1].set_title("Результат применения\nоператора Собеля");
+# gray = cv.medianBlur(gray, KERNEL_SIZE);
+# gray = convolution2(gray, KERNEL_LOWPASS);
 
-ax[1, 0].imshow(dx, cmap="gray");
-ax[1, 0].set_title("Производная по оси X");
+thresh_manual, img_manual = cv.threshold(gray, THRESH, 255, cv.THRESH_BINARY);
+thresh_otsu, img_otsu = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+img_mean = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C,\
+            cv.THRESH_BINARY, blockSize=BLOCKSIZE_MEAN, C=C_MEAN);
+img_gauss = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            cv.THRESH_BINARY, blockSize=BLOCKSIZE_GAUSS, C=C_GAUSS);
 
-ax[1, 1].imshow(dy, cmap="gray");
-ax[1, 1].set_title("Производная по оси Y")
+# гистограмма ч/б изображения
+bins = np.arange(256);
+histogram = cv.calcHist([gray], [0], None, [256], [0, 256]);
+
+# показать исходное изображение и ч/б
+fig, ax = plt.subplots(1, 3, figsize=(14,4), dpi=200);
+ax[0].imshow(img_rgb);
+ax[0].axis('off');
+
+ax[1].imshow(gray, cmap='gray', vmin=0, vmax=255);
+ax[1].set_title('Исходное изображение\nи изображение в оттенках серого');
+ax[1].axis('off');
+
+ax[2].bar(bins, histogram);
+ax[2].set_title('Гистограмма изображения в оттенках серого');
+ax[2].set_xlim(0, 255);
+ax[2].set_xlabel('Уровень яркости');
+ax[2].set_ylabel('Количество пикселей');
 
 fig.tight_layout();
 plt.show();
+
+# результаты разных методов бинаризации и гистограммы
+binary_images = [
+    ('Ручная бинаризация', img_manual, thresh_manual),
+    ('Бинаризация методом Отцу', img_otsu, thresh_otsu),
+    ('Адаптивная бинаризация\nпо среднему значению', img_mean, None),
+    ('Адаптивная бинаризация по Гауссу', img_gauss, None),
+];
+
+for title, binary_img, threshold in binary_images:
+    fig, ax = plt.subplots(1, 2, figsize=(10,4),dpi=200);
+    binary_img = np.bitwise_not(binary_img);
+    ax[0].imshow(binary_img, cmap='gray', vmin=0, vmax=255);
+    ax[0].set_title(title);
+    ax[0].axis('off');
+
+    ax[1].bar(bins, histogram);
+    if threshold is not None:
+        ax[1].axvline(
+            threshold,
+            color='red',
+            linestyle='--',
+            label='Порог = %d' % threshold
+        );
+        ax[1].legend();
+    ax[1].set_title(f'Гистограмма изображения {"\n(порог — адаптивный)" if threshold is None else ""}');
+    ax[1].set_xlim(0, 255);
+    ax[1].set_xlabel('Уровень яркости');
+    ax[1].set_ylabel('Количество пикселей');
+
+    fig.tight_layout();
+    plt.show();
