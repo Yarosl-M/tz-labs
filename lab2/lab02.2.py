@@ -72,7 +72,7 @@ C_MEAN = 6;
 BLOCKSIZE_GAUSS = 37;
 C_GAUSS = 5;
 
-gray = cv.blur(gray, (KERNEL_SIZE, KERNEL_SIZE));
+# gray = cv.blur(gray, (KERNEL_SIZE, KERNEL_SIZE));
 
 # gray = cv.medianBlur(gray, KERNEL_SIZE);
 # gray = convolution2(gray, KERNEL_LOWPASS);
