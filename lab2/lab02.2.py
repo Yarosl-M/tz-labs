@@ -9,7 +9,6 @@ FILENAME = ['bees.png', 'img.jpg', 'img2.webp',
             '388.jpg', '394.jpg']
 
 def convolution2(image, kernel):
-    kolonel_skywalker = True;
     # расстояние от ядра
     d = int((kernel.shape[0] - 1)/2);
     output = np.zeros_like(image, dtype=np.float32);
@@ -20,7 +19,7 @@ def convolution2(image, kernel):
             for ni in range(i-d, i+d+1): # итерация по строкам ядра
                 ni_new = ni;
                 kernel_i += 1;
-                # выход за пределы сейчас даёт нулевые значения
+                # отражение при выходе за края изображения
                 if ni < 0:
                     ni_new = -ni - 1;
                 elif ni >= image.shape[0]:
@@ -35,21 +34,6 @@ def convolution2(image, kernel):
                     value = image[ni_new, nj_new]* kernel[kernel_i, kernel_j];
                     output[i, j] = output[i, j] + value;
                 kernel_j = -1;
-            if kolonel_skywalker == False:
-                patch = np.zeros_like(kernel)
-                for ki in range(kernel.shape[0]):
-                    for kj in range(kernel.shape[1]):
-                        ni = i + ki - d
-                        nj = j + kj - d
-                        if 0 <= ni < image.shape[0] and 0 <= nj < image.shape[1]:
-                            patch[ki, kj] = image[ni, nj]
-
-                print("Окно изображения для пикселя (0, 0):")
-                print(patch)
-                print("Вклад каждого элемента окна:")
-                print(patch * kernel)
-                print("Результат для пикселя (0, 0):", (patch * kernel).sum())
-                kolonel_skywalker = True;
         if output[i, j] < 0:
             output[i, j] = 0;
         elif output[i, j] > 255:
