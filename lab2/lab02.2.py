@@ -59,5 +59,11 @@ plt.imshow(img_blur, cmap='gray', vmin=0, vmax=255);
 plt.title('Размытие по Гауссу');
 plt.axis('off');
 
+for i in range(21):
+    # basically a mockup of generating a random color okay
+    h = randint(0, 179);
+    s = randint(180, 255);
+    v = randint(200, 255);
+
 plt.show();
 
