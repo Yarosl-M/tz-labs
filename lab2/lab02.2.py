@@ -40,16 +40,9 @@ def convolution2(image, kernel):
             output[i, j] = 255;
     return np.round(output).astype(np.uint8);
 
-KERNEL_LOWPASS = np.ndarray(shape=(11,11), dtype=np.float32);
-# midpoint = (KERNEL_LOWPASS.shape[0] // 2, KERNEL_LOWPASS.shape[1] // 2);
-# for i in range(KERNEL_LOWPASS.shape[0]):
-#     for j in range(KERNEL_LOWPASS.shape[1]):
-#         # kernel coef = 1 / (manhattan distance from center + 1) (just for fun lol)
-#         distance = abs(i - midpoint[0]) + abs(j - midpoint[1]);
-#         KERNEL_LOWPASS[i, j] = 1 / (distance + 1);
-KERNEL_LOWPASS /= np.sum(KERNEL_LOWPASS);
-KERNEL_LOWPASS = np.ones_like(KERNEL_LOWPASS);
-KERNEL_LOWPASS /= np.sum(KERNEL_LOWPASS);
+KERNEL_SIZE = 21;
+
+KERNEL_LOWPASS = np.ones((KERNEL_SIZE, KERNEL_SIZE)) / (KERNEL_SIZE ** 2);
 
 ###############################################################################
 
