@@ -21,6 +21,10 @@ BLOCKSIZE_MEAN = 25;
 C_MEAN = 6;
 BLOCKSIZE_GAUSS = 37;
 C_GAUSS = 5;
+#
+##
+###
+####
 
 thresh_manual, img_manual = cv.threshold(gray, THRESH, 255, cv.THRESH_BINARY);
 thresh_otsu, img_otsu = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
