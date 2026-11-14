@@ -9,36 +9,56 @@ FILENAME = ['bees.png', 'img.jpg', 'img2.webp',
             '388.jpg', '394.jpg']
 
 def convolution2(image, kernel):
+    kolonel_skywalker = False;
+    # расстояние от ядра
     d = int((kernel.shape[0] - 1)/2);
     output = np.zeros_like(image, dtype=np.float32);
-    for i in range(0, image.shape[0]):
-        for j in range(0, image.shape[1]):
-            kernel_i = -1;
+    for i in range(0, image.shape[0]): # строки изображения
+        for j in range(0, image.shape[1]): # столбцы изображения
+            kernel_i = -1; 
             kernel_j = -1;
-            for ni in range(i-d, i+d+1):
-                kernel_i = kernel_i + 1;
+            for ni in range(i-d, i+d+1): # итерация по строкам ядра
+                kernel_i += 1;
+                # выход за пределы сейчас даёт нулевые значения
                 if ni < 0 or ni >= image.shape[0]:
                     continue;
-                for nj in range(j-d, j+d+1):
-                    kernel_j = kernel_j + 1;
+                for nj in range(j-d, j+d+1): # итерация по столбцам ядра
+                    kernel_j += 1;
                     if nj < 0 or nj >= image.shape[1]:
                         continue;
                     value = image[ni, nj]* kernel[kernel_i, kernel_j];
                     output[i, j] = output[i, j] + value;
                 kernel_j = -1;
+            if kolonel_skywalker == False:
+                patch = np.zeros_like(kernel)
+                for ki in range(kernel.shape[0]):
+                    for kj in range(kernel.shape[1]):
+                        ni = i + ki - d
+                        nj = j + kj - d
+                        if 0 <= ni < image.shape[0] and 0 <= nj < image.shape[1]:
+                            patch[ki, kj] = image[ni, nj]
+
+                print("Окно изображения для пикселя (0, 0):")
+                print(patch)
+                print("Вклад каждого элемента окна:")
+                print(patch * kernel)
+                print("Результат для пикселя (0, 0):", (patch * kernel).sum())
+                kolonel_skywalker = True;
         if output[i, j] < 0:
             output[i, j] = 0;
         elif output[i, j] > 255:
             output[i, j] = 255;
-    return np.round(output).astype(np.uint8)
+    return np.round(output).astype(np.uint8);
 
-KERNEL_LOWPASS = np.ndarray(shape=(21,21), dtype=np.float32);
-midpoint = (KERNEL_LOWPASS.shape[0] // 2, KERNEL_LOWPASS.shape[1] // 2);
-for i in range(KERNEL_LOWPASS.shape[0]):
-    for j in range(KERNEL_LOWPASS.shape[1]):
-        # kernel coef = 1 / (manhattan distance from center + 1) (just for fun lol)
-        distance = abs(i - midpoint[0]) + abs(j - midpoint[1]);
-        KERNEL_LOWPASS[i, j] = 1 / (distance + 1);
+KERNEL_LOWPASS = np.ndarray(shape=(67,67), dtype=np.float32);
+# midpoint = (KERNEL_LOWPASS.shape[0] // 2, KERNEL_LOWPASS.shape[1] // 2);
+# for i in range(KERNEL_LOWPASS.shape[0]):
+#     for j in range(KERNEL_LOWPASS.shape[1]):
+#         # kernel coef = 1 / (manhattan distance from center + 1) (just for fun lol)
+#         distance = abs(i - midpoint[0]) + abs(j - midpoint[1]);
+#         KERNEL_LOWPASS[i, j] = 1 / (distance + 1);
+KERNEL_LOWPASS /= np.sum(KERNEL_LOWPASS);
+KERNEL_LOWPASS = np.ones_like(KERNEL_LOWPASS);
 KERNEL_LOWPASS /= np.sum(KERNEL_LOWPASS);
 
 ###############################################################################
