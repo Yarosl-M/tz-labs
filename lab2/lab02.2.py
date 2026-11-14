@@ -65,7 +65,10 @@ C_MEAN = 6;
 BLOCKSIZE_GAUSS = 37;
 C_GAUSS = 5;
 
-gray = convolution2(gray, KERNEL_LOWPASS);
+gray = cv.blur(gray, (KERNEL_SIZE, KERNEL_SIZE));
+
+# gray = cv.medianBlur(gray, KERNEL_SIZE);
+# gray = convolution2(gray, KERNEL_LOWPASS);
 
 thresh_manual, img_manual = cv.threshold(gray, THRESH, 255, cv.THRESH_BINARY);
 thresh_otsu, img_otsu = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
