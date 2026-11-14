@@ -74,7 +74,7 @@ for title, binary_img, threshold in binary_images:
             linestyle='--',
             label='Порог = %d' % threshold
         );
-        ax[1].legend();
+        # ax[1].legend();
     ax[1].set_title(f'Гистограмма изображения {"\n(порог — адаптивный)" if threshold is None else ""}');
     ax[1].set_xlim(0, 255);
     ax[1].set_xlabel('Уровень яркости');
@@ -109,8 +109,18 @@ for title, binary_img, threshold in binary_images:
             alpha=0.75,
             label='Взвешенная сумма дисперсий'
         );
+        hist_handles, hist_labels = ax[1].get_legend_handles_labels()
+        var_handles, var_labels = variance_ax.get_legend_handles_labels()
+
+        ax[1].legend(
+            hist_handles + var_handles,
+            hist_labels + var_labels,
+            loc='upper left'
+        )
         variance_ax.set_ylabel('Взвешенная сумма дисперсий');
-        variance_ax.legend(loc='lower left');
+        # variance_ax.legend(loc='lower left');
+    elif threshold is not None:
+        ax[1].legend();
 
     fig.tight_layout();
     plt.show();
