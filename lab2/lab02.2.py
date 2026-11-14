@@ -51,13 +51,6 @@ KERNEL_HIGHPASS_Y = np.array([[-1, -2, -1],
                               [0,0,0],
                               [1, 2, 1]]);
 
-# возвращает кортеж из трёх массивов — по двум осям и совмещённый
-def sobel(img):
-    dx = convolution2(img, KERNEL_HIGHPASS_X);
-    dy = convolution2(img, KERNEL_HIGHPASS_Y);
-    s = np.square(dx) + np.square(dy);
-    return (dx, dy, s);
-
 ###############################################################################
 
 # 1) Загрузить изображение
