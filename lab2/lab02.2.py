@@ -44,6 +44,13 @@ KERNEL_SIZE = 21;
 
 KERNEL_LOWPASS = np.ones((KERNEL_SIZE, KERNEL_SIZE)) / (KERNEL_SIZE ** 2);
 
+KERNEL_HIGHPASS_X = np.array([[-1, 0, 1],
+                            [-2, 0, 2],
+                            [-1, 0, 1]]);
+KERNEL_HIGHPASS_Y = np.array([[-1, -2, -1],
+                              [0,0,0],
+                              [1, 2, 1]]);
+
 ###############################################################################
 
 # 1) Загрузить изображение
