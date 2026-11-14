@@ -8,6 +8,39 @@ FILENAME = ['bees.png', 'img.jpg', 'img2.webp',
             'aaaaaaaaaaaaaaaaaaaa.jpg',
             '388.jpg', '394.jpg']
 
+def convolution2(image, kernel):
+    d = int((kernel.shape[0] - 1)/2);
+    output = np.zeros_like(image, dtype=np.float32);
+    for i in range(0, image.shape[0]):
+        for j in range(0, image.shape[1]):
+            kernel_i = -1;
+            kernel_j = -1;
+            for ni in range(i-d, i+d+1):
+                kernel_i = kernel_i + 1;
+                if ni < 0 or ni >= image.shape[0]:
+                    continue;
+                for nj in range(j-d, j+d+1):
+                    kernel_j = kernel_j + 1;
+                    if nj < 0 or nj >= image.shape[1]:
+                        continue;
+                    value = image[ni, nj]* kernel[kernel_i, kernel_j];
+                    output[i, j] = output[i, j] + value;
+                kernel_j = -1;
+        if output[i, j] < 0:
+            output[i, j] = 0;
+        elif output[i, j] > 255:
+            output[i, j] = 255;
+    return np.round(output).astype(np.uint8)
+
+KERNEL_LOWPASS = np.ndarray(shape=(21,21), dtype=np.float32);
+midpoint = (KERNEL_LOWPASS.shape[0] // 2, KERNEL_LOWPASS.shape[1] // 2);
+for i in range(KERNEL_LOWPASS.shape[0]):
+    for j in range(KERNEL_LOWPASS.shape[1]):
+        # kernel coef = 1 / (manhattan distance from center + 1) (just for fun lol)
+        distance = abs(i - midpoint[0]) + abs(j - midpoint[1]);
+        KERNEL_LOWPASS[i, j] = 1 / (distance + 1);
+KERNEL_LOWPASS /= np.sum(KERNEL_LOWPASS);
+
 ###############################################################################
 
 # 1) Загрузить изображение
@@ -21,6 +54,8 @@ BLOCKSIZE_MEAN = 25;
 C_MEAN = 6;
 BLOCKSIZE_GAUSS = 37;
 C_GAUSS = 5;
+
+gray = convolution2(gray, KERNEL_LOWPASS);
 
 thresh_manual, img_manual = cv.threshold(gray, THRESH, 255, cv.THRESH_BINARY);
 thresh_otsu, img_otsu = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
