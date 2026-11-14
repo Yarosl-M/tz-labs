@@ -16,7 +16,7 @@ img_rgb = cv.cvtColor(img_bgr, cv.COLOR_BGR2RGB);
 gray = cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY);
 
 # 2) Выполнить бинаризацию
-THRESH = 128;
+THRESH = 120;
 BLOCKSIZE_MEAN = 25;
 C_MEAN = 6;
 BLOCKSIZE_GAUSS = 37;
@@ -61,7 +61,7 @@ binary_images = [
 
 for title, binary_img, threshold in binary_images:
     fig, ax = plt.subplots(1, 2, figsize=(10,4),dpi=200);
-
+    binary_img = np.bitwise_not(binary_img);
     ax[0].imshow(binary_img, cmap='gray', vmin=0, vmax=255);
     ax[0].set_title(title);
     ax[0].axis('off');
