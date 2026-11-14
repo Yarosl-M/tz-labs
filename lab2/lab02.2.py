@@ -9,7 +9,7 @@ FILENAME = ['bees.png', 'img.jpg', 'img2.webp',
             '388.jpg', '394.jpg']
 
 def convolution2(image, kernel):
-    kolonel_skywalker = False;
+    kolonel_skywalker = True;
     # расстояние от ядра
     d = int((kernel.shape[0] - 1)/2);
     output = np.zeros_like(image, dtype=np.float32);
@@ -18,15 +18,21 @@ def convolution2(image, kernel):
             kernel_i = -1; 
             kernel_j = -1;
             for ni in range(i-d, i+d+1): # итерация по строкам ядра
+                ni_new = ni;
                 kernel_i += 1;
                 # выход за пределы сейчас даёт нулевые значения
-                if ni < 0 or ni >= image.shape[0]:
-                    continue;
+                if ni < 0:
+                    ni_new = -ni - 1;
+                elif ni >= image.shape[0]:
+                    ni_new = image.shape[0] - (ni - image.shape[0] + 1)
                 for nj in range(j-d, j+d+1): # итерация по столбцам ядра
+                    nj_new = nj;
                     kernel_j += 1;
-                    if nj < 0 or nj >= image.shape[1]:
-                        continue;
-                    value = image[ni, nj]* kernel[kernel_i, kernel_j];
+                    if nj < 0:
+                        nj_new = -nj - 1;
+                    elif nj >= image.shape[1]:
+                        nj_new = image.shape[1] - (nj - image.shape[1] + 1)
+                    value = image[ni_new, nj_new]* kernel[kernel_i, kernel_j];
                     output[i, j] = output[i, j] + value;
                 kernel_j = -1;
             if kolonel_skywalker == False:
