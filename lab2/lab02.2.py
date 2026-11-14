@@ -40,7 +40,7 @@ def convolution2(image, kernel):
             output[i, j] = 255;
     return np.round(output).astype(np.uint8);
 
-KERNEL_LOWPASS = np.ndarray(shape=(67,67), dtype=np.float32);
+KERNEL_LOWPASS = np.ndarray(shape=(11,11), dtype=np.float32);
 # midpoint = (KERNEL_LOWPASS.shape[0] // 2, KERNEL_LOWPASS.shape[1] // 2);
 # for i in range(KERNEL_LOWPASS.shape[0]):
 #     for j in range(KERNEL_LOWPASS.shape[1]):
