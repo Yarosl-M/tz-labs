@@ -80,37 +80,5 @@ for title, binary_img, threshold in binary_images:
     ax[1].set_xlabel('Уровень яркости');
     ax[1].set_ylabel('Количество пикселей');
 
-    if title == 'Бинаризация методом Отцу':
-        thresholds = np.arange(255);
-        variances = [];
-        for value in thresholds:
-            group1 = gray[gray <= value];
-            group2 = gray[gray > value];
-            # if group1.size == 0 or group2.size == 0:
-                # variances.append(np.nan);
-            if group1.size == 0:
-                variances.append(np.var(group2));
-            elif group2.size == 0:
-                variances.append(np.var(group1));
-            else:
-                variance = (
-                    group1.size * np.var(group1)
-                    + group2.size * np.var(group2)
-                ) / gray.size;
-                # variance = np.var(group1) + np.var(group2);
-                variances.append(variance);
-
-        variance_ax = ax[1].twinx();
-        variance_ax.plot(
-            thresholds,
-            variances,
-            color='blue',
-            linestyle='--',
-            alpha=0.75,
-            label='Взвешенная сумма дисперсий'
-        );
-        variance_ax.set_ylabel('Взвешенная сумма дисперсий');
-        variance_ax.legend(loc='lower left');
-
     fig.tight_layout();
     plt.show();
