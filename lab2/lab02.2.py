@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt;
 from sys import argv;
 
 
-FILENAME = ['bees.png', 'img.jpg', 'img2.webp', 'aaaaaaaaaaaaaaaaaaaa.jpg']
+FILENAME = ['bees.png', 'img.jpg', 'img2.webp',
+            'aaaaaaaaaaaaaaaaaaaa.jpg',
+            '388.jpg', '394.jpg']
 
 ###############################################################################
 
@@ -14,14 +16,18 @@ img_rgb = cv.cvtColor(img_bgr, cv.COLOR_BGR2RGB);
 gray = cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY);
 
 # 2) Выполнить бинаризацию
-THRESH = 66;
+THRESH = 128;
+BLOCKSIZE_MEAN = 25;
+C_MEAN = 6;
+BLOCKSIZE_GAUSS = 37;
+C_GAUSS = 5;
 
 thresh_manual, img_manual = cv.threshold(gray, THRESH, 255, cv.THRESH_BINARY);
 thresh_otsu, img_otsu = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
 img_mean = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C,\
-            cv.THRESH_BINARY, blockSize=43, C=1);
+            cv.THRESH_BINARY, blockSize=BLOCKSIZE_MEAN, C=C_MEAN);
 img_gauss = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            cv.THRESH_BINARY, blockSize=55, C=1);
+            cv.THRESH_BINARY, blockSize=BLOCKSIZE_GAUSS, C=C_GAUSS);
 
 # гистограмма ч/б изображения
 bins = np.arange(256);
