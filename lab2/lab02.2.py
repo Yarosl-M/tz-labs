@@ -107,7 +107,7 @@ for title, binary_img, threshold in binary_images:
             color='blue',
             linestyle='--',
             alpha=0.75,
-            label='Сумма дисперсий'
+            label='Взвешенная сумма дисперсий'
         );
         hist_handles, hist_labels = ax[1].get_legend_handles_labels()
         var_handles, var_labels = variance_ax.get_legend_handles_labels()
