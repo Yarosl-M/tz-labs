@@ -6,7 +6,7 @@ from sys import argv;
 
 FILENAME = ['bees.png', 'img.jpg', 'img2.webp',
             'aaaaaaaaaaaaaaaaaaaa.jpg',
-            '388.jpg', ]#'394.jpg']
+            '388.jpg','394.jpg']
 
 def convolution2(image, kernel):
     # расстояние от ядра
