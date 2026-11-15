@@ -1,7 +1,9 @@
 import numpy as np;
 import cv2 as cv;
 import matplotlib.pyplot as plt;
+from matplotlib.patches import Rectangle as PlotRectangle;
 from random import randint;
+from classes import find_bounding_box;
 
 
 FILENAME = '394.jpg';
@@ -12,8 +14,8 @@ THRESH = 120;
 BLOCKSIZE_MEAN = 25;
 C_MEAN = 4;
 
-MIN_AREA = 0;
-MAX_AREA = 12251997;
+MIN_AREA = 350;
+MAX_AREA = 999999999999999999999;
 
 ###############################################################################
 
@@ -42,24 +44,15 @@ ax[1].axis('off');
 fig.tight_layout();
 plt.show();
 
-# wait a sec
-# might have cut too much off?
-# whatever
-# в общем, что надо
-# в первой строке два столбца: оригинал цветной и ч/б
-# затем:
-# 1) размытие
-# 2) бинаризация
-# 3) маркировка (would be fun to make random HSV colours)
-# 4) окаймление прямоугольниками
-# ну всё равно можно каждый отдельно выводить
-# можно и без цикла действительно
-
+# после размытия
+plt.figure(dpi=200);
 plt.imshow(img_blur, cmap='gray', vmin=0, vmax=255);
 plt.title('Размытие по Гауссу');
 plt.axis('off');
 plt.show();
 
+# после бинаризации
+plt.figure(dpi=200);
 plt.imshow(img_thresh, cmap='gray');
 plt.title('После адаптивной бинаризации');
 plt.axis('off');
@@ -70,6 +63,10 @@ plt.show();
 # соответствует определённая метка
 # (метка 0 — для фона)
 num_labels, labels = cv.connectedComponents(img_thresh);
+
+bb = find_bounding_box(labels, num_labels);
+# print(bb[1:4])
+
 label_color = [(randint(0,179), randint(150,200), randint(200,255))
                for i in range(num_labels)];
 label_color[0] = (20,20,20);
@@ -78,8 +75,35 @@ for i in range(img_thresh.shape[0]):
     for j in range(img_thresh.shape[1]):
         img_objects[i, j] = label_color[labels[i, j]];
 img_objects = cv.cvtColor(img_objects, cv.COLOR_HSV2RGB);
+# отдельные промаркированные компоненты
+plt.figure(dpi=200);
 plt.imshow(img_objects);
 plt.title('Размеченные связные компоненты изображения');
 plt.axis('off');
 plt.show();
 
+plt.figure(dpi=200);
+img_rect = np.copy(img_objects);
+i = 0;
+for b in filter(lambda box: box.area >= MIN_AREA and box.area <= MAX_AREA, bb[1:]):
+    cv.rectangle(img_rect,
+                 pt1=(b.upper_left.x, b.upper_left.y),
+                 pt2=(b.lower_right.x, b.lower_right.y),
+                 color=(255,0,0),
+                 thickness=2);
+print(max([b.area for b in bb[1:]]));
+print(max([b.area for b in bb]));
+plt.imshow(img_rect);
+plt.title('Объекты, выделенные прямоугольниками');
+plt.axis('off');
+# и с прямоугольниками
+
+    # plt.gca().add_patch(PlotRectangle(
+    #     (b.upper_left.x - 0.5, b.upper_left.y - 0.5),
+    #     b.width + 1,
+    #     b.height + 1,
+    #     fill=False,
+    #     edgecolor='red',
+    #     linewidth=1
+    # ));
+plt.show();
