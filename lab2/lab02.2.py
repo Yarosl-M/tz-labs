@@ -10,7 +10,7 @@ KERNEL_SIZE = 15;
 
 THRESH = 120;
 BLOCKSIZE_MEAN = 25;
-C_MEAN = 6;
+C_MEAN = 4;
 
 MIN_AREA = 0;
 MAX_AREA = 12251997;
@@ -23,8 +23,8 @@ gray = cv.cvtColor(img_rgb, cv.COLOR_RGB2GRAY);
 
 img_blur = cv.GaussianBlur(gray, (KERNEL_SIZE, KERNEL_SIZE), 0);   
 
-img_thresh = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C,\
-            cv.THRESH_BINARY, blockSize=BLOCKSIZE_MEAN, C=C_MEAN);
+img_thresh = cv.adaptiveThreshold(img_blur,255,cv.ADAPTIVE_THRESH_MEAN_C,\
+            cv.THRESH_BINARY_INV, blockSize=BLOCKSIZE_MEAN, C=C_MEAN);
 
 img_segment = img_thresh;
 # затем выводится img_segment опять но с прямоугольниками окда
@@ -58,12 +58,28 @@ plt.show();
 plt.imshow(img_blur, cmap='gray', vmin=0, vmax=255);
 plt.title('Размытие по Гауссу');
 plt.axis('off');
+plt.show();
 
-for i in range(21):
-    # basically a mockup of generating a random color okay
-    h = randint(0, 179);
-    s = randint(180, 255);
-    v = randint(200, 255);
+plt.imshow(img_thresh, cmap='gray');
+plt.title('После адаптивной бинаризации');
+plt.axis('off');
+plt.show();
 
+# num_labels — количество меток
+# labels — изображение, где каждому пикселю
+# соответствует определённая метка
+# (метка 0 — для фона)
+num_labels, labels = cv.connectedComponents(img_thresh);
+label_color = [(randint(0,179), randint(150,200), randint(200,255))
+               for i in range(num_labels)];
+label_color[0] = (20,20,20);
+img_objects = np.zeros((img_thresh.shape[0],img_thresh.shape[1],3), dtype=np.uint8);
+for i in range(img_thresh.shape[0]):
+    for j in range(img_thresh.shape[1]):
+        img_objects[i, j] = label_color[labels[i, j]];
+img_objects = cv.cvtColor(img_objects, cv.COLOR_HSV2RGB);
+plt.imshow(img_objects);
+plt.title('Размеченные связные компоненты изображения');
+plt.axis('off');
 plt.show();
 
