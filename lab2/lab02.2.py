@@ -89,7 +89,7 @@ for b in filter(lambda box: box.area >= MIN_AREA and box.area <= MAX_AREA, bb[1:
     cv.rectangle(img_rect,
                  pt1=(b.upper_left.x, b.upper_left.y),
                  pt2=(b.lower_right.x, b.lower_right.y),
-                 color=(255,0,0),
+                 color=(255,255,0),
                  thickness=2);
 print(max([b.area for b in bb[1:]]));
 print(max([b.area for b in bb]));
